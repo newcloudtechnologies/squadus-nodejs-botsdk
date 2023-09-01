@@ -1,0 +1,9 @@
+**/node_modules/
+.idea
+.DS_Store
+.env
+.vscode
+yarn-error.log
+/examples/dist
+/examples/yarn.lock
+/coverage

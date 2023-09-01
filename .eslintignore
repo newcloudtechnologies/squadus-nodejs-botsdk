@@ -1,0 +1,6 @@
+/dist/**/*
+/examples/**/*
+/.eslintrc.js
+jest.config.js
+/copyrightTemplate.js
+/coverage/**/*

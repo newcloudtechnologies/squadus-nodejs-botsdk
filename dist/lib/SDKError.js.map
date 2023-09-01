@@ -1,0 +1,1 @@
+{"version":3,"file":"SDKError.js","sourceRoot":"","sources":["../../src/lib/SDKError.ts"],"names":[],"mappings":";AAAA;;;;;;GAMG;;;AAIH,MAAa,QAAS,SAAQ,KAAK;IAG/B,YAAY,IAAe,EAAE,KAAc;QACvC,KAAK,EAAE,CAAC;QACR,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;IACvB,CAAC;CACJ;AARD,4BAQC"}

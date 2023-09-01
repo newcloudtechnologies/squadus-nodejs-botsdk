@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "emitDeclarationOnly": false,
+        "declaration": false,
+        "esModuleInterop": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "sourceMap": false,
+        "strict": true,
+        "target": "es2021",
+        "types": ["node"]
+    },
+    "lib": ["es2015"],
+    "exclude": ["node_modules", "dist"]
+}

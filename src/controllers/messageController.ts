@@ -1,5 +1,5 @@
 /*
- * Copyright (c) New Cloud Technologies, Ltd., 2013-2023
+ * Copyright (c) New Cloud Technologies, Ltd., 2013-2026
  *
  * You can not use the contents of the file in any way without New Cloud Technologies, Ltd. written permission.
  * To obtain such a permit, you should contact New Cloud Technologies, Ltd. at http://ncloudtech.com/contact.html
@@ -17,7 +17,7 @@ import {
     SendMessageToThreadSDKParams,
     RestClientError,
 } from '../lib/types';
-import { SquadusClient } from '../client';
+import { MySquadusClient } from '../client';
 import { ErrorCode } from '../lib/constants';
 import {
     isPathValid,
@@ -27,15 +27,15 @@ import {
 } from '../utils';
 
 export class MessageController {
-    private squadusClient: SquadusClient;
+    private mySquadusClient: MySquadusClient;
     private readonly allowedAttachmentsPath: string;
 
     constructor(params: {
-        squadusClient: SquadusClient;
+        mySquadusClient: MySquadusClient;
         allowedAttachmentsPath: string;
     }) {
-        const { squadusClient, allowedAttachmentsPath } = params;
-        this.squadusClient = squadusClient;
+        const { mySquadusClient, allowedAttachmentsPath } = params;
+        this.mySquadusClient = mySquadusClient;
         this.allowedAttachmentsPath = allowedAttachmentsPath;
     }
 
@@ -43,7 +43,7 @@ export class MessageController {
         params: SendMessageByRidSDKParams,
     ): Promise<MessageResponseData> {
         validateSendMessageByRidParams(params);
-        return await this.squadusClient.restClient.sendMessage({
+        return await this.mySquadusClient.restClient.sendMessage({
             message: params,
         });
     }
@@ -52,9 +52,10 @@ export class MessageController {
         params: SendMessageToThreadSDKParams,
     ): Promise<MessageResponseData> {
         validateSendMessageToThread(params);
-        const { parentMessageId, msg } = params;
-        return await this.squadusClient.restClient.sendMessage({
+        const { parentMessageId, msg, rid } = params;
+        return await this.mySquadusClient.restClient.sendMessage({
             message: {
+                rid: rid,
                 tmid: parentMessageId,
                 msg,
             },
@@ -80,7 +81,7 @@ export class MessageController {
         if (msg) {
             form.append('description', msg);
         }
-        return await this.squadusClient.restClient.sendAttachment({
+        return await this.mySquadusClient.restClient.sendAttachment({
             form,
             rid,
         });

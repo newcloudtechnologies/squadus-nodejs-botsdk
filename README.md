@@ -1,6 +1,6 @@
-# Squadus bot SDK
+# MySquadus bot SDK
 
-Пакет `@squadus/botsdk` содержит HTTP-клиент для осуществления запросов к серверу Squadus. Используется для разработки ботов, работающих с мессенджером Squadus.
+Пакет `@squadus/botsdk` содержит HTTP-клиент для осуществления запросов к серверу MySquadus. Используется для разработки ботов, работающих с мессенджером MySquadus.
 
 # 📚 Документация
 
@@ -10,7 +10,6 @@
 * [Обработка ошибок](#обработка-ошибок)
 * [API](#api)
 * [Примеры](#примеры)
-* [Ограничения](#Известные-ограничения)
 
 ## Требования
 
@@ -31,21 +30,21 @@ $ npm install @squadus/botsdk
 
 ### Инициализация клиента
 
-Пакет `@squadus/botsdk` экспортирует класс `SquadusClient`. Для использования нужно создать экземпляр класса, передав в конструктор адрес сервера, токен и разрешенный путь до папки с файлами, которые разрешено прикреплять к сообщениям, а затем вызвать `connect`.
+Пакет `@squadus/botsdk` экспортирует класс `MySquadusClient`. Для использования нужно создать экземпляр класса, передав в конструктор адрес сервера, токен и разрешенный путь до папки с файлами, которые разрешено прикреплять к сообщениям, а затем вызвать `connect`.
 
 ```javascript
-import { SquadusClient } from '@squadus/botsdk';
+import { MySquadusClient } from '@squadus/botsdk';
 
 // Создание клиента
-const squadusClient = new SquadusClient({
+const mySquadusClient = new MySquadusClient({
     token: 'a89cDxjI1l',
     server: 'https://im.example.ru/',
     allowedAttachmentsPath: './',
 });
-await squadusClient.connect();
+await mySquadusClient.connect();
 ```
 
-Токен для авторизации можно сгенерировать вручную в веб- или настольном клиенте Squadus. Для этого необходимо:
+Токен для авторизации можно сгенерировать вручную в веб- или настольном клиенте MySquadus. Для этого необходимо:
 1. Войти в учетную запись бота.
 2. Перейти на странице «Настройки» в раздел «Токены личного доступа».
 3. На открывшейся странице ввести название токена.
@@ -56,14 +55,14 @@ await squadusClient.connect();
 
 ### Вызов метода
 
-Каждый из методов `SquadusClient` относится к одной из сущностей:
+Каждый из методов `MySquadusClient` относится к одной из сущностей:
 - `room`;
 - `message`;
 - `subscription`.
 
 Например, метод `sendMessageByRid` используется для отправки сообщения.
-Чтобы его вызвать, необходимо обратиться к нему следующим образом: `squadusClient.message.sendMessageByRid()`, где
-- `squadusClient` – инстанс класса `SquadusClient`;
+Чтобы его вызвать, необходимо обратиться к нему следующим образом: `mySquadusClient.message.sendMessageByRid()`, где
+- `mySquadusClient` – инстанс класса `MySquadusClient`;
 - `message` – сущность, которая содержит в себе методы для совершения операций над комнатами;
 - `sendMessageByRid` – метод для отправки сообщений.
 
@@ -72,7 +71,7 @@ await squadusClient.connect();
 const roomId = '...';
 
 (async () => {
-    const result = await squadusClient.message.sendMessageByRid({
+    const result = await mySquadusClient.message.sendMessageByRid({
         msg: 'Hello world!',
         rid: roomId,
     });
@@ -82,7 +81,7 @@ const roomId = '...';
 ```
 
 ##### Примечание: 
-Некоторые методы, такие как `connect`, `getSettings`, не относятся ни к одной из сущностей. Такие методы можно вызвать напрямую из инстанса класса `SquadusClient`.
+Некоторые методы, такие как `connect`, `getSettings`, не относятся ни к одной из сущностей. Такие методы можно вызвать напрямую из инстанса класса `MySquadusClient`.
 
 ---
 
@@ -90,13 +89,13 @@ const roomId = '...';
 - динамически определять вызываемый метод,
 - вызывать методы, которые недоступны в используемой версии клиента.
 
-Для этого можно воспользоваться конструкцией: `squadusClient.restClient.post(im.create, [options])`.
+Для этого можно воспользоваться конструкцией: `mySquadusClient.restClient.post(im.create, [options])`.
 
 Приведенный выше метод может быть использован следующим образом:
 
 ```javascript
 (async () => {
-    const response = await squadusClient.restClient.post('im.create', {
+    const response = await mySquadusClient.restClient.post('im.create', {
         username: 'new_user',
     });
 })();
@@ -111,18 +110,18 @@ const roomId = '...';
 
 ```javascript
 // Import ErrorCode from the package
-import { SquadusClient, ErrorCode } from 'squadus/botsdk';
+import { MySquadusClient, ErrorCode } from '@squadus/botsdk';
 
 const { TOKEN, SERVER } = process.env;
 
-const squadusClient = new SquadusClient({
+const mySquadusClient = new MySquadusClient({
     token: TOKEN || '',
     server: SERVER || '',
 });
 
 (async () => {
     try {
-        await squadusClient.connect();
+        await mySquadusClient.connect();
     } catch (error) {
         if (error === ErrorCode.AuthorizationError) {
             console.log('Authorization error');
@@ -165,10 +164,10 @@ const squadusClient = new SquadusClient({
 ## Методы API
 В таблице представлены описание методов, их аргументов и возвращаемых ими значений.
 
-| Метод                           | Группа    | Аргументы                                           | Ответ                                         | Описание                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|---------------------------------|-----------|-----------------------------------------------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Метод                           | Группа    | Аргументы                                           | Ответ                                         | Описание                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|---------------------------------|-----------|-----------------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `connect()`|     -      | - | `Promise<void>` | Выполняет авторизацию |
-| `getSettings(settings)` | - | `settings?: Array<SettingsName>` | `RestResponse<SettingsResponseData>` | Возвращает значения настроек, имена которых были переданы в метод. Если не передавать имена, будут возвращены все настройки |
+| `getSettings({ settings, server })` | - | `settings?: Array<SettingsName>, server?: string` | `RestResponse<SettingsResponseData>` | Возвращает значения настроек для указанного сервера, имена которых были переданы в метод. Если не передавать имена, будут возвращены все настройки |
 | `sendMessageByRid(params)` | `message` | `params: SendMessageByRidParams` | `Promise<MessageResponseData>` | Выполняет отправку сообщения по идентификатору комнаты |
 | `sendAttachment(params)` | `message` | `params: SendAttachmentSDKParams` | `Promise<MessageResponseData>` | Выполняет отправку вложения по идентификатору комнаты |
 | `createDirectRoom(username)` | `room` | `username: string` | `Promise<DirectRoomResponseData \| undefined>` | Создает личную переписку с пользователем, имя которого было передано в качестве аргумента |
@@ -177,7 +176,7 @@ const squadusClient = new SquadusClient({
 | `createChannel(params)` | `room` | `params: CreateChannelSDKParams` | `RestResponse<ChannelData>` | Создает комнату с переданными параметрами |
 | `setUserRole(params)` | `room` | `params: CreatePublicChannelSDKParams \| CreatePrivateChannelSDKParams` | `RestResponse<CreatePublicChannelResponseData \| CreatePrivateChannelResponseData>` | Изменяет роль пользователя в комнате |
 | `saveRoomSettings(params)` | `room` | `params: SaveRoomSettingsSDKParams` | `RestResponse<SaveRoomSettingsData>` | Изменяет настройки комнаты по ее идентификатору |
-| `onMessage(callback[, rid])` | `subscription` | `callback: (msg: LastMessage) => void, rid?: string` | `Promise<OnMessagesResponse>` | Вызывает переданную функцию с новым полученным сообщением в определенном чате `rid` или во всех |
+| `onMessage(callback[, rid])` | `subscription` | `callback: (msg: LastMessage) => void, rid?: string` | `Promise<OnMessagesResponse>` | Вызывает переданную функцию с новым полученным сообщением в определенном чате `rid` или во всех. Поддерживает автоматическую подписку на новые чаты и получение сообщений из тредов |
 | `onRoomChange(rid, callback)` | `subscription` | `rid: string, callback: (data: RoomEvent) => void` | `Promise<OnRoomChangeResponse>` | Вызывает переданную функцию с каждым событием в чате |
 | `onReaction(rid, msgId, callback)` | `subscription` | `rid: string, msgId: string, callback: (message: Message) => void` | `Promise<onReactionResponse>` | Вызывает переданную функцию с сообщением при изменении его реакций |
 | `onEvent(callback)` | `subscription` | `callback: (data: WsData) => void` | `Subscription` | Вызывает переданную функцию со всеми событиями, полученными по протоколу WebSocket |
@@ -195,13 +194,14 @@ const squadusClient = new SquadusClient({
 
 ## Примеры
 
-В корне пакета `@squadus/botsdk` находится папка `examples` – это проект с несколькими примерами использования методов из **таблицы 1**.
-С помощью приведенных примеров можно ознакомиться с использованием данного пакета на практике.
+> **Примеры вынесены в отдельный репозиторий:** [squadus-nodejs-botsdk-examples](https://github.com/newcloudtechnologies/squadus-nodejs-botsdk-examples)
 
-Чтобы выполнить код из папки `examples`, необходимо:
+Репозиторий с примерами содержит проект с несколькими сценариями использования методов SDK.
 
-1. Установить зависимости из папки `examples`: `cd examples && yarn`.
-2. Внести токен пользователя (бота), от чьего имени будут осуществляться действия, адрес сервера и имя собеседника в файл `./examples/.env`.
+Чтобы выполнить примеры, необходимо:
+
+1. Клонировать репозиторий с примерами и установить зависимости: `yarn`.
+2. Внести токен пользователя (бота), от чьего имени будут осуществляться действия, адрес сервера и имя собеседника в файл `.env`.
 
 ```javascript
 SERVER="https://******"
@@ -220,7 +220,7 @@ PARTNER_NAME="yourPartnerName"
 ### 4. sendMessage.ts `yarn send-message`
 С собеседником, указанным в файле `.env`, если такой пользователь существует, будет создан диалог. Затем ему будет отправлено сообщение с текстом `Hi`.
 ### 5. sendAttachment.ts `yarn send-attachment`
-С собеседником, указанным в файле `.env`, если такой пользователь существует, будет создан диалог. Затем ему будет отправлено изображение `example.png` из проекта с сообщением `Image with logo`. Если изображение будет заменено на файл с размером, превышающим допустимый, в консоли появится сообщение об ошибке: `File is too large`. Также файл должен находиться по пути, который соответствует параметру `allowedAttachmentsPath`, указанному  при создании `squadusClient`.
+С собеседником, указанным в файле `.env`, если такой пользователь существует, будет создан диалог. Затем ему будет отправлено изображение `example.png` из проекта с сообщением `Image with logo`. Если изображение будет заменено на файл с размером, превышающим допустимый, в консоли появится сообщение об ошибке: `File is too large`. Также файл должен находиться по пути, который соответствует параметру `allowedAttachmentsPath`, указанному  при создании `mySquadusClient`.
 ### 6. addRemoveChannelUser.ts `yarn add-remove-channel-user`
 Собеседник, указанный в файле `.env`, если такой пользователь существует, будет добавлен в указанный канал. Затем он будет удален из него.
 ### 7. createPrivateChannel.ts `yarn create-channel:private`
@@ -245,7 +245,15 @@ PARTNER_NAME="yourPartnerName"
 Будет отправлено сообщение, на основании идентификатора которого будет создана цепочка ответов. 
 ### 15. readThread.ts `yarn read-thread`
 Будет отправлено сообщение, на основании идентификатора которого будет создана цепочка ответов. Цепочка ответов будет отмечена как прочитанная пользователем, имя и токен которого указаны в переменных окружения `PARTNER_NAME` и `PARTNER_TOKEN` соответственно.
-
-## Известные ограничения
-1. Для исключения ошибок при подключении к WebSocket адрес сервера не должен содержать символ "/" в конце ссылки (на текущий момент ошибка локализована и будет устранена во втором квартале 2025 года).
-2. Для корректной работы BotSDK рекомендуется включить настройку "Показывать отчёт о прочтении" в панели администрирования Squadus. Отключение настройки не позволит обрабатывать BotSDK подписки на новые сообщения в чатах.
+### 16. getUserInfoByEmail.ts `yarn get-user-info-by-email`
+Будет выполнен запрос информации о пользователе по его email, который указан в переменной окружения `PARTNER_EMAIL`.
+### 17. subscribeMessagesThread.ts `yarn subscribe-messages-thread`
+Бот создаст личный диалог с пользователем `PARTNER_NAME`, отправит родительское сообщение и создаст тред. Затем будет выполнена подписка на все новые сообщения через `subscription.onMessage()`. Если пользователь ответит в этом треде сообщением _«Hi»_, бот получит сообщение из цепочки ответов и отправит _«Test passed :white_check_mark:»_ в тот же тред. Этот пример проверяет получение сообщений из тредов в уже существующей комнате.
+### 18. subscribeMessagesAutoResubscribe.ts `yarn subscribe-messages-auto-resubscribe`
+Ботом будет выполнена подписка на все новые сообщения через `subscription.onMessage()`. После этого бот создаст новый приватный чат, добавит в него пользователя `PARTNER_NAME` и отправит туда инструкцию. Если пользователь ответит в этом новом чате сообщением _«Hi»_, бот получит сообщение без ручной переподписки на `rooms-changed` и отправит ответ _«Test case is passed :white_check_mark:»_. Для чистой проверки удобно использовать пользователя, с которым у бота ещё нет активного чата.
+### 19. subscribeMessagesAutoResubscribeDirect.ts `yarn subscribe-messages-auto-resubscribe-direct`
+Ботом будет выполнена подписка на все новые сообщения через `subscription.onMessage()`. После этого бот создаст новый личный диалог с пользователем `PARTNER_NAME` и отправит туда инструкцию. Если пользователь ответит в этом новом личном диалоге сообщением _«Hi»_, бот получит сообщение без ручной переподписки на `rooms-changed` и отправит ответ _«Test case is passed :white_check_mark:»_. Для чистой проверки удобно использовать пользователя, с которым у бота ещё нет активного личного диалога.
+### 20. subscribeMessagesAutoResubscribeThread.ts `yarn subscribe-messages-auto-resubscribe-thread`
+Ботом будет выполнена подписка на все новые сообщения через `subscription.onMessage()`. После этого бот создаст новый личный диалог с пользователем `PARTNER_NAME`, отправит туда родительское сообщение и создаст новый тред. Если пользователь ответит в этом новом треде сообщением _«Hi»_, бот получит сообщение без ручной переподписки и отправит ответ _«Test case is passed :white_check_mark:»_ в тот же тред.
+### 21. connectViaProxy.ts: `yarn connect:proxy`
+Будет произведена авторизация на сервере через узказанный в окружении `PROXY_URL`.

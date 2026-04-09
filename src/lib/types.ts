@@ -1,5 +1,5 @@
 /*
- * Copyright (c) New Cloud Technologies, Ltd., 2013-2023
+ * Copyright (c) New Cloud Technologies, Ltd., 2013-2026
  *
  * You can not use the contents of the file in any way without New Cloud Technologies, Ltd. written permission.
  * To obtain such a permit, you should contact New Cloud Technologies, Ltd. at http://ncloudtech.com/contact.html
@@ -50,9 +50,11 @@ export {
     RoleName,
     UserResponse as UserResponseData,
     ChannelRoomType,
+    ServerInfoResponse,
 } from '@squadus/core/dist/restClient/types';
 
 export {
+    CommonSubscriptionData,
     SubscriptionData,
     RoomsChangedEvent,
     WsData,
@@ -102,6 +104,9 @@ export type ClientParams = {
     token: string;
     server: string;
     allowedAttachmentsPath?: string;
+    /** Custom HTTP(S) agent for proxy support (e.g. https-proxy-agent, socks-proxy-agent) */
+    agent?: import('http').Agent | import('https').Agent;
+    proxyUrl?: string;
 };
 
 export type SetUserRoleSDKParams = Omit<SetUserRoleRequestParams, 't'>;
@@ -152,9 +157,14 @@ export type ValidateOnRoomChangeParams = {
     rid: string;
 };
 
+export type OnMessageOptions = {
+    includeThreadMessages?: boolean;
+};
+
 export type ValidateOnMessageParams = {
     cb: (lastMessage: LastMessage) => void;
     rid?: string;
+    options?: OnMessageOptions;
 };
 
 export type ValidateSubscribeParams = {

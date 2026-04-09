@@ -1,67 +1,76 @@
 /*
- * Copyright (c) New Cloud Technologies, Ltd., 2013-2023
+ * Copyright (c) New Cloud Technologies, Ltd., 2013-2026
  *
  * You can not use the contents of the file in any way without New Cloud Technologies, Ltd. written permission.
  * To obtain such a permit, you should contact New Cloud Technologies, Ltd. at http://ncloudtech.com/contact.html
  *
  */
 
-import { SquadusClient } from '../client';
+import { MySquadusClient } from '../client';
 import { ErrorCode } from '../lib/constants';
 import {
-    RestResponse,
-    CreatePublicChannelResponseData,
-    CreatePrivateChannelResponseData,
-    GetRoomInfoByRoomIdRequestParams,
-    GetRoomInfoResponseData,
-    DirectRoomResponseData,
-    RoomType,
-    SaveRoomSettingsResponseData,
-    SaveRoomSettingsRequestParams,
-    SaveRoomSettingsSDKParams,
     AddUsersToRoomRequestParams,
-    SetUserRoleRequestParams,
-    RoomTypeForApi,
-    SetUserRoleResponseData,
-    SetUserRoleSDKParams,
-    RemoveUserFromChannelResponseData,
-    CreatePublicChannelSDKParams,
+    ChannelRoomType,
+    CreatePrivateChannelRequestParams,
+    CreatePrivateChannelResponseData,
     CreatePrivateChannelSDKParams,
     CreatePublicChannelRequestParams,
-    CreatePrivateChannelRequestParams,
-    ChannelRoomType,
+    CreatePublicChannelResponseData,
+    CreatePublicChannelSDKParams,
+    DirectRoomResponseData,
+    GetRoomInfoByRoomIdRequestParams,
+    GetRoomInfoResponseData,
     IsPrivateType,
+    RemoveUserFromChannelResponseData,
     RemoveUserFromChannelSDKParams,
     RestClientError,
+    RestResponse,
+    RoomType,
+    RoomTypeForApi,
+    SaveRoomSettingsRequestParams,
+    SaveRoomSettingsResponseData,
+    SaveRoomSettingsSDKParams,
+    SetUserRoleRequestParams,
+    SetUserRoleResponseData,
+    SetUserRoleSDKParams,
 } from '../lib/types';
 import {
+    validateAddUsersToRoomParams,
+    validateCreateChannelParams,
     validateCreatePrivateChannelParams,
     validateCreatePublicChannelParams,
+    validateGetRoomInfoByRoomIdParams,
+    validateReadThreadParam,
+    validateRemoveUserFromChannelParams,
     validateSaveRoomSettingsParams,
     validateSetUserRoleParams,
-    validateAddUseToRoomParams,
-    validateGetRoomInfoByRoomIdParams,
-    validateCreateChannelParams,
     validateUsernameParam,
-    validateRemoveUserFromChannelParams,
-    validateReadThreadParam,
 } from '../utils';
 
 export class RoomController {
-    private squadusClient: SquadusClient;
+    private mySquadusClient: MySquadusClient;
 
-    constructor(params: { squadusClient: SquadusClient }) {
-        this.squadusClient = params.squadusClient;
+    constructor(params: { mySquadusClient: MySquadusClient }) {
+        this.mySquadusClient = params.mySquadusClient;
     }
 
     async readThread(parentMessageId: string): Promise<void> {
         validateReadThreadParam(parentMessageId);
-        return await this.squadusClient.restClient.readThread(parentMessageId);
+
+        //Need this call because method.call/readThreads doesn't return any error
+        //when thread doesn't exist
+        await this.mySquadusClient.restClient.getThreadMessages(
+            parentMessageId,
+        );
+
+        return await this.mySquadusClient.restClient.readThread(
+            parentMessageId,
+        );
     }
 
     async createChannel(
         params: CreatePublicChannelSDKParams | CreatePrivateChannelSDKParams,
-    ): RestResponse<
+    ): Promise<
         CreatePublicChannelResponseData | CreatePrivateChannelResponseData
     > {
         const { isPrivate } = params;
@@ -77,7 +86,7 @@ export class RoomController {
 
     private async createPublicChannel(
         params: CreatePublicChannelSDKParams,
-    ): RestResponse<CreatePublicChannelResponseData> {
+    ): Promise<CreatePublicChannelResponseData> {
         validateCreatePublicChannelParams(params);
         const { name, readOnly = false, members = [], teamId } = params;
         const data: CreatePublicChannelRequestParams = {
@@ -86,12 +95,12 @@ export class RoomController {
             members,
             teamId,
         };
-        return await this.squadusClient.restClient.createChannel(data);
+        return await this.mySquadusClient.restClient.createChannel(data);
     }
 
     private async createPrivateChannel(
         params: CreatePrivateChannelSDKParams,
-    ): RestResponse<CreatePrivateChannelResponseData> {
+    ): Promise<CreatePrivateChannelResponseData> {
         validateCreatePrivateChannelParams(params);
         const {
             name,
@@ -102,30 +111,29 @@ export class RoomController {
         } = params;
 
         const data: CreatePrivateChannelRequestParams = {
-            name,
-            readOnly,
             encrypted,
             members,
+            name,
+            readOnly,
             teamId,
         };
-        return await this.squadusClient.restClient.createGroup(data);
+        return await this.mySquadusClient.restClient.createGroup(data);
     }
 
     async getRoomInfoByRoomId(
         params: GetRoomInfoByRoomIdRequestParams,
     ): RestResponse<GetRoomInfoResponseData> {
         validateGetRoomInfoByRoomIdParams(params);
-        return await this.squadusClient.restClient.getRoomInfoByRoomId(params);
+        return await this.mySquadusClient.restClient.getRoomInfoByRoomId(
+            params,
+        );
     }
 
     async createDirectRoom(
         username: string,
     ): Promise<DirectRoomResponseData | undefined> {
         validateUsernameParam(username);
-        const response = await this.squadusClient.restClient.createDirectRoom(
-            username,
-        );
-        return response?.data.room;
+        return await this.mySquadusClient.restClient.createDirectRoom(username);
     }
 
     saveRoomSettings = async (
@@ -146,27 +154,27 @@ export class RoomController {
             encrypted,
         } = params;
         const data: SaveRoomSettingsRequestParams = {
-            rid,
-            roomName,
-            roomDescription,
-            roomTopic,
-            roomAnnouncement,
-            roomType: isPrivate ? RoomType.Group : RoomType.PublicChannel,
-            readOnly,
-            systemMessages,
+            encrypted,
             joinCode,
             reactWhenReadOnly,
-            encrypted,
+            readOnly,
+            rid,
+            roomAnnouncement,
+            roomDescription,
+            roomName,
+            roomTopic,
+            roomType: isPrivate ? RoomType.Group : RoomType.PublicChannel,
+            systemMessages,
         };
-        return await this.squadusClient.restClient.saveRoomSettings(data);
+        return await this.mySquadusClient.restClient.saveRoomSettings(data);
     };
 
     async addUsersToRoom(
         params: AddUsersToRoomRequestParams,
     ): RestResponse<boolean> {
-        validateAddUseToRoomParams(params);
+        validateAddUsersToRoomParams(params);
 
-        return await this.squadusClient.restClient.addUsersToRoom([params]);
+        return await this.mySquadusClient.restClient.addUsersToRoom([params]);
     }
 
     async setUserRole(
@@ -184,13 +192,13 @@ export class RoomController {
 
         const roomType = roomInfo?.data.room.t;
         const data: SetUserRoleRequestParams = {
-            roomId,
             roleName,
             roleValue,
+            roomId,
             t: roomType as RoomTypeForApi,
             userId,
         };
-        return await this.squadusClient.restClient.setUserRole(data);
+        return await this.mySquadusClient.restClient.setUserRole(data);
     }
 
     // delete from cannel or discussion
@@ -210,7 +218,7 @@ export class RoomController {
         }
 
         const roomType = roomInfo?.data.room.t as ChannelRoomType;
-        return await this.squadusClient.restClient.removeUserFromChannel({
+        return await this.mySquadusClient.restClient.removeUserFromChannel({
             rid,
             username,
             roomType,
